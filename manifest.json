@@ -1,1 +1,22 @@
-
+{
+  "name": "أثر تايكون - إمبراطورية المال",
+  "short_name": "أثر تايكون",
+  "description": "لعبة اقتصادية عربية - ابنِ إمبراطوريتك المالية",
+  "start_url": "/index.html",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "theme_color": "#03010a",
+  "background_color": "#03010a",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
