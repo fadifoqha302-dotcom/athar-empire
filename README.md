@@ -1,23 +1,3 @@
-            --battle-red: #f43f5e; --clan-blue: #38bdf8;
-            --summer: #fb923c; --ocean: #2dd4bf; --sun: #fbbf24;
-            --softcap: #f59e0b; --locked: #64748b;
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-bg: rgba(255, 255, 255, 0.02);
-        }
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Tajawal', 'Changa', sans-serif;
-            user-select: none; -webkit-user-select: none;
-            touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-        }
-        body {
-            background: var(--bg); color: var(--text);
-            display: flex; flex-direction: column;
-            height: 100vh; height: 100dvh; overflow: hidden;
-            padding-bottom: 80px;
-            background-image: 
-                radial-gradient(ellipse at 50% 30%, rgba(0, 229, 160, 0.08) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 20%, rgba(0, 200, 255, 0.04) 0%, transparent 40%);
             box-shadow: inset 0 0 200px rgba(0,0,0,0.8);
         }
         #bgCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.5; }
