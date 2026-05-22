@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="htmlRoot">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>أثر تايكون: الأسطورة الخالدة V23</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Changa:wght@500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Canvas للخلفية -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- شاشة البداية -->
+  <div id="splashScreen">
+    <div class="splash-logo">👑</div>
+    <div class="splash-title">أثــر</div>
+    <div class="splash-loading">
+      <div class="splash-loading-fill"></div>
+    </div>
+    <div class="splash-version">V23 · النسخة الكاملة</div>
+  </div>
+
+  <!-- نافذة اختيار الصعوبة -->
+  <div id="difficultyModal" class="modal hidden">
+    <div class="modal-box">
+      <h2 style="color:var(--gold); margin-bottom:20px;">اختر مستوى الصعوبة 🎯</h2>
+      <p style="color:#94a3b8; margin-bottom:20px;">لا يمكن تغيير الصعوبة لاحقاً!</p>
+      
+      <div class="difficulty-card" onclick="selectDifficulty('easy')" id="diffEasy">
+        <div class="diff-icon">🌱</div>
+        <h3 style="color:#00ff87;">مبتدئ</h3>
+        <p>إنتاج 100% · أسعار 100% · خبرة 100%</p>
+        <small>تجربة سلسة للاستمتاع بالقصة</small>
+      </div>
+      
+      <div class="difficulty-card selected" onclick="selectDifficulty('normal')" id="diffNormal">
+        <div class="diff-icon">⚔️</div>
+        <h3 style="color:#fbbf24;">محارب</h3>
+        <p>إنتاج 70% · أسعار 130% · خبرة 80%</p>
+        <small>تجربة متوازنة تحتاج تخطيط</small>
+      </div>
+      
+      <div class="difficulty-card" onclick="selectDifficulty('hard')" id="diffHard">
+        <div class="diff-icon">💀</div>
+        <h3 style="color:#ff4444;">أسطوري</h3>
+        <p>إنتاج 45% · أسعار 170% · خبرة 60%</p>
+        <small>تحدٍ حقيقي لأصحاب الخبرة</small>
+      </div>
+      
+      <div class="difficulty-card" onclick="selectDifficulty('nightmare')" id="diffNightmare">
+        <div class="diff-icon">🌑</div>
+        <h3 style="color:#a855f7;">كابوس</h3>
+        <p>إنتاج 25% · أسعار 220% · خبرة 40%</p>
+        <small>كل نقرة مهمة... كل قرار مصيري</small>
+      </div>
+      
+      <button class="btn btn-ultra" style="margin-top:20px;" onclick="confirmDifficulty()">
+        تأكيد الاختيار 🚀
+      </button>
+    </div>
+  </div>
+
+  <!-- نافذة المكافأة اليومية -->
+  <div id="dailyRewardModal" class="modal hidden">
+    <div class="modal-box">
+      <h2 style="color:var(--sun);">المكافأة اليومية 🎁</h2>
+      <div style="font-size:55px; margin:15px 0;">☀️</div>
+      <div style="font-size:30px;color:#fff;" id="dailyText">+10 Gems</div>
+      <div style="color:var(--ocean);margin-bottom:18px;">
+        اليوم <span id="dailyStreak">1</span> 🔥
+      </div>
+      <button class="btn btn-ultra" onclick="claimDailyReward()">استلام المكافأة</button>
+    </div>
+  </div>
+
+  <!-- نافذة اسم الشركة -->
+  <div id="startupModal" class="modal hidden">
+    <div class="modal-box">
+      <h2 style="color:var(--ultra);">تأسيس الإمبراطورية 👑</h2>
+      <p style="color:#94a3b8; margin:10px 0;">أدخل اسم شركتك لبدء رحلتك</p>
+      <input type="text" id="companyNameInput" placeholder="اسم الشركة" maxlength="20">
+      <button class="btn btn-ultra" onclick="startGame()">بدء اللعب 🚀</button>
+    </div>
+  </div>
+
+  <!-- نافذة أرباح الغياب -->
+  <div id="offlineModal" class="modal hidden">
+    <div class="modal-box">
+      <h2 style="color:var(--gold);">أرباح فترة الغياب 🌙</h2>
+      <div style="font-size:42px;color:var(--primary);">+<span id="offlineAmount">0</span>💰</div>
+      <button class="btn" onclick="closeOfflineModal()">تحويل للخزينة</button>
+    </div>
+  </div>
+
+  <!-- نافذة نتيجة المعركة -->
+  <div id="battleResultModal" class="modal hidden">
+    <div class="modal-box" id="battleResultContent"></div>
+  </div>
+
+  <!-- نافذة Prestige -->
+  <div id="prestigeModal" class="modal hidden">
+    <div class="modal-box">
+      <div style="font-size:50px; margin-bottom:15px;">🌌</div>
+      <h2 style="color:var(--prestige);">الارتقاء الكوني</h2>
+      <p style="color:#cbd5e1; line-height:1.8; margin:15px 0;">
+        ستفقد <span style="color:var(--danger);">ذهبك ومستوى إنتاجك</span>، 
+        لكنك ستكسب <span style="color:var(--prestige);">نقاط مهارة كونية (PP)</span> للتطوير الدائم.
+      </p>
+      <div class="prestige-info">
+        <div class="prestige-row">
+          <span>النقاط المكتسبة:</span>
+          <span class="prestige-value" id="pendingPP">0</span>
+        </div>
+        <div class="prestige-row">
+          <span>إجمالي نقاطك:</span>
+          <span class="total-pp" id="totalPPDisplay">0</span>
+        </div>
+      </div>
+      <button class="btn btn-prestige" onclick="confirmPrestige()">تأكيد إعادة التعيين</button>
+      <button class="btn btn-cancel" onclick="closePrestigeModal()">إلغاء</button>
+    </div>
+  </div>
+
+  <!-- رسائل التوست -->
+  <div class="toast" id="toastMsg"><span>تم!</span></div>
+
+  <!-- الهيدر -->
+  <div class="header">
+    <div class="header-top">
+      <div class="header-left">
+        <div class="level-text">Lvl <span id="uiLevel">1</span></div>
+        <div id="uiTitle" class="title-badge">[مبتدئ]</div>
+        <span id="diffBadge" class="diff-badge"></span>
+      </div>
+      <div class="company-name" id="uiCompanyName">الشركة</div>
+      <span class="settings-btn" onclick="openSettings()">⚙️</span>
+    </div>
+    <div class="xp-bar-container">
+      <div class="xp-fill" id="xpBar" style="width:0%;"></div>
+    </div>
+    <div class="top-stats">
+      <div class="stat-money"><span id="moneyDisplay">0</span> 💰</div>
+      <div class="stat-gems"><span id="gemsDisplay">0</span> 💎</div>
+    </div>
+    <div class="income-text">+<span id="incomeDisplay">0</span>/s</div>
+  </div>
+
+  <!-- منطقة النقر -->
+  <div class="clicker-section">
+    <div class="main-btn" id="mainBtn" onpointerdown="handleClick(event)">
+      <h2>أثــر</h2>
+    </div>
+  </div>
+
+  <!-- المحتوى المتغير -->
+  <div id="tab-buildings" class="tab-content active">
+    <div class="tab-header">
+      <h3>المنشآت 🏭</h3>
+      <button class="btn btn-sm btn-outline" id="buyMultBtn" onclick="toggleBuyMult()">x1</button>
+    </div>
+    <div id="buildingsList"></div>
+  </div>
+
+  <div id="tab-skills" class="tab-content">
+    <div id="skillsContent"></div>
+  </div>
+
+  <div id="tab-stocks" class="tab-content">
+    <div id="stocksContent"></div>
+  </div>
+
+  <div id="tab-quests" class="tab-content">
+    <div id="questsContent"></div>
+  </div>
+
+  <div id="tab-achievements" class="tab-content">
+    <div id="achContent"></div>
+  </div>
+
+  <div id="tab-summer" class="tab-content">
+    <div id="summerContent"></div>
+  </div>
+
+  <div id="tab-battle" class="tab-content">
+    <div id="battleContent"></div>
+  </div>
+
+  <div id="tab-clan" class="tab-content">
+    <div id="clanContent"></div>
+  </div>
+
+  <div id="tab-loot" class="tab-content">
+    <div id="lootContent"></div>
+  </div>
+
+  <div id="tab-store" class="tab-content">
+    <div id="storeContent"></div>
+  </div>
+
+  <!-- شريط التنقل السفلي -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('tab-buildings',this)">
+      <div class="nav-icon">🏭</div>
+      <span class="nav-label">منشآت</span>
+    </div>
+    <div class="nav-item locked" id="navSkills" data-unlock="3" onclick="handleLockedNav('skills',this)">
+      <div class="nav-icon">🌳</div>
+      <span class="nav-label">مهارات</span>
+    </div>
+    <div class="nav-item locked" id="navStocks" data-unlock="5" onclick="handleLockedNav('stocks',this)">
+      <div class="nav-icon">📈</div>
+      <span class="nav-label">بورصة</span>
+    </div>
+    <div class="nav-item locked" id="navQuests" data-unlock="2" onclick="handleLockedNav('quests',this)">
+      <div class="nav-icon">📜</div>
+      <span class="nav-label">مهام</span>
+    </div>
+    <div class="nav-item locked" id="navAch" data-unlock="1" onclick="handleLockedNav('achievements',this)">
+      <div class="nav-icon">⭐</div>
+      <span class="nav-label">إنجازات</span>
+    </div>
+    <div class="nav-item locked" id="navSummer" data-unlock="4" onclick="handleLockedNav('summer',this)">
+      <div class="nav-icon">☀️</div>
+      <span class="nav-label">الصيف</span>
+    </div>
+    <div class="nav-item locked" id="navBattle" data-unlock="8" onclick="handleLockedNav('battle',this)">
+      <div class="nav-icon">⚔️</div>
+      <span class="nav-label">معركة</span>
+    </div>
+    <div class="nav-item locked" id="navClan" data-unlock="15" onclick="handleLockedNav('clan',this)">
+      <div class="nav-icon">🛡️</div>
+      <span class="nav-label">فصائل</span>
+    </div>
+    <div class="nav-item locked" id="navLoot" data-unlock="6" onclick="handleLockedNav('loot',this)">
+      <div class="nav-icon">🎁</div>
+      <span class="nav-label">صناديق</span>
+    </div>
+    <div class="nav-item locked" id="navStore" data-unlock="1" onclick="handleLockedNav('store',this)">
+      <div class="nav-icon">💎</div>
+      <span class="nav-label">متجر</span>
+    </div>
+  </div>
+
+  <!-- تحميل ملف الجافاسكريبت -->
+  <script src="game.js"></script>
+</body>
+</html>
