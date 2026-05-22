@@ -141,9 +141,17 @@
 
 <div id="dailyRewardModal" class="modal hidden"><div class="modal-box"><h2 style="color:var(--sun);" id="lblDailyRewardTitle">المكافأة اليومية 🎁</h2><div style="font-size:55px; margin: 15px 0;">☀️</div><div style="font-size:30px;color:#fff;font-weight:800;" id="dailyText">+10 Gems</div><div style="color:var(--ocean);margin-bottom:18px; font-weight: 700;"><span id="lblDailyStreak">اليوم</span> <span id="dailyStreak">1</span> 🔥</div><button class="btn btn-ultra" id="lblDailyClaimBtn" onclick="claimDailyReward()">استلام المكافأة</button></div></div>
 <div id="startupModal" class="modal hidden"><div class="modal-box"><h2 style="color:var(--ultra);" id="lblStartupTitle">تأسيس الإمبراطورية 👑</h2><p style="color:#94a3b8; margin: 10px 0;" id="lblStartupDesc">أدخل اسم شركتك لبدء رحلتك نحو الأسطورة</p><input type="text" id="companyNameInput" class="modal-input" placeholder="اسم شركتك" maxlength="20" style="width:100%; padding:16px; border-radius:14px; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); color:#fff; text-align:center; font-size:18px; margin-bottom:20px;"><button class="btn btn-ultra" id="lblStartupBtn" onclick="startGame()">بدء اللعب 🚀</button></div></div>
-<div id="settingsModal" class="modal hidden"><div class="modal-box"><h2 style="color:white; margin-bottom: 15px;" id="lblSettingsTitle">الإعدادات ⚙️</h2><button class="btn" style="background:var(--prestige);color:#010105;margin-bottom:12px;" onclick="toggleLang()">🌍 اللغة / Language</button><button class="btn btn-prestige" style="margin-bottom:12px;" onclick="openPrestigeModal()">🌌 إعادة التعيين الكوني (Prestige)</button><button class="btn btn-prestige" style="margin-bottom:12px;" id="lblGiftCode" onclick="let c=prompt(lang==='ar'?'أدخل الكود:':'Enter code:');if(c)redeemCode(c);">🎁 كود الهدايا</button><button class="btn" style="background:var(--danger);color:white;margin-bottom:12px;" id="lblResetData" onclick="hardReset()">⚠️ مسح البيانات</button><button class="btn" style="background:rgba(255,255,255,0.05);color:white; border: 1px solid var(--glass-border);" id="lblCloseSettings" onclick="document.getElementById('settingsModal').classList.add('hidden')">إغلاق</button></div></div>
+<div id="settingsModal" class="modal hidden"><div class="modal-box"><h2 style="color:white; margin-bottom: 15px;" id="lblSettingsTitle">الإعدادات ⚙️</h2><button class="btn" style="background:var(--gold);color:#010105;margin-bottom:12px;" onclick="showLeaderboard()">🏆 لوحة المتصدرين</button><button class="btn" style="background:var(--prestige);color:#010105;margin-bottom:12px;" onclick="toggleLang()">🌍 اللغة / Language</button><button class="btn btn-prestige" style="margin-bottom:12px;" onclick="openPrestigeModal()">🌌 إعادة التعيين الكوني (Prestige)</button><button class="btn btn-prestige" style="margin-bottom:12px;" id="lblGiftCode" onclick="let c=prompt(lang==='ar'?'أدخل الكود:':'Enter code:');if(c)redeemCode(c);">🎁 كود الهدايا</button><button class="btn" style="background:var(--danger);color:white;margin-bottom:12px;" id="lblResetData" onclick="hardReset()">⚠️ مسح البيانات</button><button class="btn" style="background:rgba(255,255,255,0.05);color:white; border: 1px solid var(--glass-border);" id="lblCloseSettings" onclick="document.getElementById('settingsModal').classList.add('hidden')">إغلاق</button></div></div>
 <div id="offlineModal" class="modal hidden"><div class="modal-box" style="border-color:var(--gold);"><h2 style="color:var(--gold);" id="lblOfflineTitle">تقرير الأرباح وأنت غائب 🌙</h2><div style="font-size:42px;color:var(--primary);font-weight:800; margin: 20px 0;">+<span id="offlineAmount">0</span>💰</div><button class="btn" id="lblOfflineClaim" onclick="closeOfflineModal()">تحويل للخزينة</button></div></div>
 <div id="battleResultModal" class="modal hidden"><div class="modal-box" id="battleResultContent"></div></div>
+
+<!-- ========== نافذة المتصدرين ========== -->
+<div id="leaderboardModal" class="modal hidden">
+    <div class="modal-box" style="max-width:500px;">
+        <div id="leaderboardContent"></div>
+    </div>
+</div>
+
 <div id="prestigeModal" class="modal hidden">
     <div class="modal-box" style="border: 1px solid rgba(167, 139, 250, 0.3);">
         <div style="font-size: 50px; margin-bottom: 15px;">🌌</div>
@@ -207,6 +215,7 @@
     <div class="nav-item locked" id="navClan" data-unlock="15" onclick="handleLockedNav('clan', this)"><div class="nav-icon">🛡️</div><span class="nav-label">فصائل</span><span class="nav-lvl-req">Lvl 15</span></div>
     <div class="nav-item locked" id="navLoot" data-unlock="4" onclick="handleLockedNav('loot', this)"><div class="nav-icon">🎁</div><span class="nav-label">صناديق</span><span class="nav-lvl-req">Lvl 4</span></div>
     <div class="nav-item locked" id="navStore" data-unlock="1" onclick="handleLockedNav('store', this)"><div class="nav-icon">💎</div><span class="nav-label">متجر</span><span class="nav-lvl-req">Lvl 1</span></div>
+    <div class="nav-item" onclick="showLeaderboard()"><div class="nav-icon">🏆</div><span class="nav-label">المتصدرين</span></div>
 </div>
 
 <script>
@@ -275,8 +284,8 @@
     ];
 
     const MS=[25,50,100,200,400,800,1500,3000,6000,12000,25000,50000];
-    function dimFac(l,sc){if(l<=sc)return 1;return Math.pow(sc/l, 0.55)} // أقوى softcap
-    function msBonus(l){let b=1;MS.forEach(m=>{if(l>=m)b*=1.35});return Math.min(b, 500)} // أبطأ
+    function dimFac(l,sc){if(l<=sc)return 1;return Math.pow(sc/l, 0.55)}
+    function msBonus(l){let b=1;MS.forEach(m=>{if(l>=m)b*=1.35});return Math.min(b, 500)}
 
     const SDB=[
         {id:'s1',t:1,n:{ar:"قوة النقر",en:"Click"},d:{ar:"+35%",en:"+35%"},max:25,b:3,m:1.8},
@@ -371,7 +380,7 @@
     function updateQuest(tp,a){if(!G.quests||!G.quests.list)return;G.quests.list.forEach(q=>{if(q.tp===tp&&!q.cl&&q.pr<q.tg){q.pr+=a;if(q.pr>=q.tg)toast("🏆 مهمة!")}});if(tp==='earn')G.quests.list.forEach(q=>{if(q.tp==='earn'&&!q.cl)q.pr=Math.min(q.tg,G.dailyEarned)});renderQuests()}
     function claimQuest(i){let q=G.quests.list[i];if(q&&q.pr>=q.tg&&!q.cl){q.cl=true;G.gems+=q.rw;save();updateAllUI();renderQuests();sGe()}}
 
-    function calcPendingPP(){if(G.totalEarned<5e6)return 0;return Math.floor(Math.sqrt(G.totalEarned/5e6))} // أصعب
+    function calcPendingPP(){if(G.totalEarned<5e6)return 0;return Math.floor(Math.sqrt(G.totalEarned/5e6))}
     function openPrestigeModal(){
         let pp=calcPendingPP();
         document.getElementById('pendingPP').innerText=pp;
@@ -575,6 +584,10 @@
 
 <!-- ========== نظام الإعلانات ========== -->
 <script src="ads.js"></script>
+
+<!-- ========== نظام المتصدرين ========== -->
+<script src="leaderboard.js"></script>
+
 <script>
     document.addEventListener('deviceready', function() {
         if (typeof adManager !== 'undefined') {
