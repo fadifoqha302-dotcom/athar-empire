@@ -189,9 +189,16 @@
   <div class="xp-bar-container"><div class="xp-fill" id="xpBar" style="width:0%;"></div></div>
   <div class="top-stats"><div class="stat-money"><span id="moneyDisplay">0</span> 💰</div><div class="stat-gems"><span id="gemsDisplay">0</span> 💎</div></div>
   <div style="color:var(--gold);margin-top:8px;">+<span id="incomeDisplay">0</span>/s</div>
+  <div style="display:flex;justify-content:center;margin-top:12px;">
+    <button class="btn btn-sm" style="width:auto;background:linear-gradient(135deg,var(--ad-color),var(--danger));color:#fff;" onclick="showRewardedAd()">📺 شاهد إعلانًا واكسب مكافأة</button>
+  </div>
 </div>
 
 <div class="clicker-section"><div class="main-btn" id="mainBtn" onpointerdown="handleClick(event)"><h2 style="color:white;font-size:24px;">أثــر</h2></div></div>
+
+<div id="bannerAdContainer" class="banner-ad-shell">
+  <div class="banner-ad-inner">📢 Test Banner Ad</div>
+</div>
 
 <div id="tab-buildings" class="tab-content active"><div style="display:flex;justify-content:space-between;margin-bottom:16px;"><h3>المنشآت 🏭</h3><button class="btn btn-sm" style="background:rgba(255,255,255,0.03);border:1px solid var(--primary);color:var(--primary);" id="buyMultBtn" onclick="toggleBuyMult()">x1</button></div><div id="buildingsList"></div></div>
 <div id="tab-skills" class="tab-content"><div id="skillsContent"></div></div>
@@ -392,6 +399,44 @@ let buyMult=1,buyModes=[1,10,100,'max'],buyIdx=0,eventMult=1,eventTimer=0;
 let battle={active:false,enemy:null,eHP:0,eMax:0,pHP:0,pMax:0,reward:0,time:0,maxTime:0,dps:0,tick:0};
 let needsUpdate=false,wheelSpinning=false;
 const SAVE_KEY='AtharV24_Ultimate';
+const TEST_REWARDED_AD_UNIT_ID='ca-app-pub-3940256099942544/5224354917';
+const TEST_BANNER_AD_UNIT_ID='ca-app-pub-3940256099942544/6300978111';
+let rewardedAdBusy=false,rewardedAdPending=false;
+
+function showBannerAd(){
+  const bannerAdContainer=document.getElementById('bannerAdContainer');
+  if(!bannerAdContainer)return;
+  if(window.Android&&typeof window.Android.showBannerAd==='function'){
+    window.Android.showBannerAd(TEST_BANNER_AD_UNIT_ID);
+  }else{
+    bannerAdContainer.innerHTML='<div class="banner-ad-inner">📢 Test Banner Ad</div>';
+  }
+}
+
+function showRewardedAd(){
+  if(rewardedAdBusy){toast('⏳ جاري مشاهدة إعلان سابق...');return}
+  rewardedAdBusy=true;rewardedAdPending=true;
+  toast('📺 جاري فتح إعلان المكافأة...');
+  if(window.Android&&typeof window.Android.showRewardedAd==='function'){
+    window.Android.showRewardedAd(TEST_REWARDED_AD_UNIT_ID);
+  }else{
+    setTimeout(()=>{
+      if(rewardedAdPending) onAdRewardReceived();
+    },1200);
+  }
+}
+
+function onAdRewardReceived(){
+  if(!rewardedAdPending)return;
+  rewardedAdPending=false;rewardedAdBusy=false;
+  let rewardMoney=Math.max(1500,Math.floor(G.money*0.03));
+  let rewardGems=20;
+  addMoney(rewardMoney);
+  G.gems+=rewardGems;
+  sfxWin();vibrate([20,20,20]);
+  toast('✅ تم استلام المكافأة: +'+fmt(rewardMoney)+' 💰 و +'+rewardGems+' 💎');
+  save();updateAllUI();
+}
 
 function getDiff(){return DIFFICULTIES[G.difficulty]}
 function isUnlocked(f){return G.level>=UNLOCK[f]}
@@ -738,11 +783,14 @@ function openBox(rarity,free){
   toast("🎁 +"+fmt(money)+"💰 +"+gems+"💎");
 }
 function watchAd(type){
+  if(type==='rewarded'||type==='gems'){
+    showRewardedAd();
+    return;
+  }
   toast("📺 تحميل العرض...");
   setTimeout(()=>{
     if(type==='stocks'){G.adBoost=600;toast("⚡ Stock x2 10min!")}
     else if(type==='loot'){if(G.boxUsedToday){toast("⚠️ مرة واحدة يومياً");return}G.boxUsedToday=true;openBox('rare',true)}
-    else if(type==='gems'){G.gems+=20;toast("✅ +20 💎")}
     else if(type==='warp'){let e=1500;BDB.forEach(b=>{if(b.tp==='auto'&&G.buildings[b.id]>0)e+=Math.floor(1500/(b.tm/cache.speed))*getYield(b)*G.premium});addMoney(e*eventMult);toast("🚀 +"+fmt(e)+" 💰")}
     sfxBuy();save();updateAllUI();
   },800);
