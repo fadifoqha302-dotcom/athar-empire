@@ -7,6 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
   <title>أثر تايكون: الأسطورة الخالدة V24</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -965,6 +966,14 @@ function gameLoop(now){
   recalcTimer+=dt;
   if(recalcTimer>0.4){calcStats();updateAllUI();recalcTimer=0;}else if(needsUpdate){updateAllUI();}
   requestAnimationFrame(gameLoop);
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('pwabuilder-sw.js').catch(err => {
+      console.warn('Service worker registration failed:', err);
+    });
+  });
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
