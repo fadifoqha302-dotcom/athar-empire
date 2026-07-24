@@ -2,12 +2,17 @@
 <html lang="ar" dir="rtl" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, minimal-ui">
   <meta name="theme-color" content="#03010a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="أثر تايكون">
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="msapplication-config" content="none">
+  <meta name="msapplication-TileColor" content="#03010a">
+  <meta name="application-name" content="أثر تايكون">
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="./icon-512.png" sizes="512x512">
   <title>أثر تايكون: الأسطورة الخالدة V24</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -496,10 +501,30 @@ function startGameWithDifficulty(){
   toast('🚀 '+G.company+' | '+getDiff().name);
 }
 function startFullGame(){
+  // محاولة الدخول في Full Screen
+  requestFullscreen().catch(err => {
+    console.log('Full screen request failed:', err);
+  });
+  
   resetDaily();calcStats();updateAura();updateAllUI();updateAllNavLock();renderAll();
   checkOffline();checkDailyReward();save();
   setInterval(updateStocks,10000);setInterval(randomEvent,35000);
   requestAnimationFrame(gameLoop);setInterval(save,2000);
+}
+
+// دالة متعددة المتصفحات لطلب Full Screen
+function requestFullscreen(){
+  const elem = document.documentElement;
+  if (elem.requestFullscreen) {
+    return elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) {
+    return elem.webkitRequestFullscreen();
+  } else if (elem.mozRequestFullScreen) {
+    return elem.mozRequestFullScreen();
+  } else if (elem.msRequestFullscreen) {
+    return elem.msRequestFullscreen();
+  }
+  return Promise.reject(new Error('Fullscreen not supported'));
 }
 
 function resetDaily(){
@@ -531,13 +556,17 @@ function generateQuests(){
 }
 
 // ==================== HELPERS ====================
-const SFX=["","K","M","B","T","Qa","Qi","Sx","Sp","Oc"];
+const SFX=["","K","M","B","T","Qa","Qi","Sx","Sp","Oc","Un","Db","Tr","Qat","Quin","Sex","Sept","Oct","Non","Dec"];
 function fmt(n){
   if(isNaN(n)||n<0||n===null)return"0";
   if(n<1000)return Math.floor(n).toString();
   let t=Math.log10(Math.abs(n))/3|0;
-  if(t>=SFX.length)return n.toExponential(2);
-  return(n/Math.pow(10,t*3)).toFixed(2)+SFX[t];
+  // منع الصيغة العلمية - التقسيم عند أقصى اختصار متاح
+  if(t>=SFX.length)t=SFX.length-1;
+  let formatted=(n/Math.pow(10,t*3)).toFixed(2);
+  // إزالة الأصفار الزائدة على اليمين والفاصلة العشرية إن لم تكن مطلوبة
+  formatted=formatted.replace(/\.?0+$/,'');
+  return formatted+SFX[t];
 }
 
 // ==================== CORE MECHANICS ====================
@@ -1016,11 +1045,26 @@ function gameLoop(now){
   requestAnimationFrame(gameLoop);
 }
 
+// ==================== PWA SERVICE WORKER REGISTRATION ====================
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('pwabuilder-sw.js').catch(err => {
-      console.warn('Service worker registration failed:', err);
-    });
+    navigator.serviceWorker.register('pwabuilder-sw.js', { scope: '/athar-empire/' })
+      .then(registration => {
+        console.log('Service Worker registered successfully:', registration);
+        // فحص التحديثات كل 6 ساعات
+        setInterval(() => registration.update(), 6 * 60 * 60 * 1000);
+      })
+      .catch(err => {
+        console.warn('Service worker registration failed:', err);
+      });
+  });
+  
+  // معالجة إشعارات التحديث
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return;
+    refreshing = true;
+    window.location.reload();
   });
 }
 
