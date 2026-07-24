@@ -1,0 +1,21 @@
+{
+  "short_name": "أثر",
+  "name": "أثر تايكون",
+  "description": "لعبة استراتيجية لبناء وإدارة إمبراطوريتك التجارية وتطويرها.",
+  "start_url": "/athar-empire/",
+  "scope": "/athar-empire/",
+  "id": "/athar-empire/",
+  "lang": "ar",
+  "dir": "rtl",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
