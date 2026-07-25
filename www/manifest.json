@@ -1,0 +1,53 @@
+{
+  "short_name": "أثر",
+  "name": "أثر تايكون",
+  "description": "لعبة استراتيجية لبناء وإدارة إمبراطوريتك التجارية وتطويرها.",
+  "start_url": "/athar-empire/",
+  "scope": "/athar-empire/",
+  "id": "/athar-empire/",
+  "lang": "ar",
+  "dir": "rtl",
+  "display": "fullscreen",
+  "orientation": "portrait-primary",
+  "background_color": "#03010a",
+  "theme_color": "#00e5a0",
+  "categories": ["games"],
+  "screenshots": [
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "icons": [
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "العب الآن",
+      "short_name": "العب",
+      "description": "ابدأ لعبة أثر تايكون فوراً",
+      "url": "/athar-empire/?mode=play",
+      "icons": [
+        {
+          "src": "./icon-512.png",
+          "sizes": "192x192",
+          "type": "image/png",
+          "purpose": "any maskable"
+        }
+      ]
+    }
+  ]
+}
