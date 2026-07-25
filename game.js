@@ -293,15 +293,34 @@ function generateQuests() {
 }
 
 // ==================== HELPERS ====================
-const SFX = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc'];
+// دالة تنسيق أرقام موحدة لمنع الصيغة العلمية وإظهار الاختصارات المطلوبة
+function formatNumber(num) {
+  if (num === null || num === undefined || isNaN(num)) return '0';
+  num = Number(num);
+  if (num < 1000) return num.toFixed(0);
 
-function fmt(n) {
-  if (isNaN(n) || n < 0 || n === null) return '0';
-  if (n < 1000) return Math.floor(n).toString();
-  let t = Math.log10(Math.abs(n)) / 3 | 0;
-  if (t >= SFX.length) return n.toExponential(2);
-  return (n / Math.pow(10, t * 3)).toFixed(2) + SFX[t];
+  const suffixes = [
+    "", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc",
+    "UDc", "DDc", "TDc", "QaDc", "QiDc", "SxDc", "SpDc", "OcDc", "NDc", "Vg",
+    "UVg", "DVg", "TVg", "QaVg", "QiVg", "SxVg", "SpVg", "OcVg", "NVg", "Tg"
+  ];
+
+  let exp = Math.floor(Math.log10(Math.abs(num)));
+  let suffixIndex = Math.floor(exp / 3);
+
+  if (suffixIndex < suffixes.length) {
+    let scaled = num / Math.pow(10, suffixIndex * 3);
+    // إزالة الأصفار الزائدة بعد الفاصلة
+    let s = scaled.toFixed(2).replace(/\.?0+$/, '');
+    return s + (suffixes[suffixIndex] ? (' ' + suffixes[suffixIndex]) : '');
+  } else {
+    let mantissa = (num / Math.pow(10, exp)).toFixed(2).replace(/\.?0+$/, '');
+    return mantissa + 'e' + exp;
+  }
 }
+
+// احتفاظ بتوافق الاسم القديم `fmt` بحيث لا نحتاج لتعديل كل الاستدعاءات
+const fmt = formatNumber;
 
 // ==================== CORE MECHANICS ====================
 function addMoney(a) {

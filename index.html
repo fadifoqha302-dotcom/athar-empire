@@ -556,18 +556,33 @@ function generateQuests(){
 }
 
 // ==================== HELPERS ====================
-const SFX=["","K","M","B","T","Qa","Qi","Sx","Sp","Oc","Un","Db","Tr","Qat","Quin","Sex","Sept","Oct","Non","Dec"];
-function fmt(n){
-  if(isNaN(n)||n<0||n===null)return"0";
-  if(n<1000)return Math.floor(n).toString();
-  let t=Math.log10(Math.abs(n))/3|0;
-  // منع الصيغة العلمية - التقسيم عند أقصى اختصار متاح
-  if(t>=SFX.length)t=SFX.length-1;
-  let formatted=(n/Math.pow(10,t*3)).toFixed(2);
-  // إزالة الأصفار الزائدة على اليمين والفاصلة العشرية إن لم تكن مطلوبة
-  formatted=formatted.replace(/\.?0+$/,'');
-  return formatted+SFX[t];
+// استخدام نفس دالة formatNumber الموحدة لمنع الصيغة العلمية وإظهار اختصارات واضحة
+function formatNumber(num) {
+  if (num === null || num === undefined || isNaN(num)) return '0';
+  num = Number(num);
+  if (num < 1000) return num.toFixed(0);
+
+  const suffixes = [
+    "", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc",
+    "UDc", "DDc", "TDc", "QaDc", "QiDc", "SxDc", "SpDc", "OcDc", "NDc", "Vg",
+    "UVg", "DVg", "TVg", "QaVg", "QiVg", "SxVg", "SpVg", "OcVg", "NVg", "Tg"
+  ];
+
+  let exp = Math.floor(Math.log10(Math.abs(num)));
+  let suffixIndex = Math.floor(exp / 3);
+
+  if (suffixIndex < suffixes.length) {
+    let scaled = num / Math.pow(10, suffixIndex * 3);
+    let s = scaled.toFixed(2).replace(/\.?0+$/, '');
+    return s + (suffixes[suffixIndex] ? (' ' + suffixes[suffixIndex]) : '');
+  } else {
+    let mantissa = (num / Math.pow(10, exp)).toFixed(2).replace(/\.?0+$/, '');
+    return mantissa + 'e' + exp;
+  }
 }
+
+// تهيئة alias قديمة لضمان التوافق مع استدعاءات سابقة
+const fmt = formatNumber;
 
 // ==================== CORE MECHANICS ====================
 function addMoney(a){
